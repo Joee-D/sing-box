@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INTERFACE='ens16'
+INTERFACE='lo'
 TPROXY_PORT=7895 ## 和 sing-box 中定义的一致
 ROUTING_MARK=666 ## 和 sing-box 中定义的一致
 PROXY_FWMARK=1
@@ -37,7 +37,17 @@ clearFirewallRules()
         echo "clear ip rule"
     fi
 
-    nft flush ruleset
+	for nft in "mangle_prerouting" "mangle_output"; do
+        local handles=$(nft -a list chain inet fw4 ${nft} 2>/dev/null | grep -E "singbox_" | awk -F '# handle ' '{print$2}')
+		for handle in $handles; do
+			nft delete rule inet fw4 ${nft} handle ${handle} 2>/dev/null
+		done
+	done
+
+	for handle in $(nft -a list chains | grep -E "chain singbox_" | awk -F '# handle ' '{print$2}'); do
+		nft delete chain inet fw4 handle ${handle} 2>/dev/null
+	done
+ 
     echo "clear nftables"
 }
 
@@ -48,9 +58,6 @@ then
 
     ip -f inet rule add fwmark $PROXY_FWMARK lookup $PROXY_ROUTE_TABLE
     ip -f inet route add local default dev $INTERFACE table $PROXY_ROUTE_TABLE
-    sysctl -w net.ipv4.ip_forward=1 > /dev/null
-
-    nft add table inet sing-box
 
     # ----- prerouting 局域网设备透明代理 -----
     nft add chain inet sing-box prerouting_tproxy { type filter hook prerouting priority -150\; policy accept\; }
