@@ -1,0 +1,252 @@
+{
+    "log": {
+        "disabled": false,
+        "level": "warn",
+        "timestamp": true
+    },
+    "dns": {
+        "servers": [
+            {
+                "tag": "mainDNS",
+                "address": "https://223.6.6.6/dns-query",
+                "detour": "DIRECT"
+            },
+            {
+                "tag": "localDNS",
+                "address": "udp://116.116.116.116",
+                "detour": "DIRECT"
+            },
+            {
+                "tag": "cloudflareDNS",
+                "address": "https://1.1.1.1/dns-query",
+                "detour": "PROXY"
+            },
+            {
+                "tag": "refusedDNS",
+                "address": "rcode://refused"
+            },
+            {
+                "tag": "fakeipDNS",
+                "address": "fakeip"
+            }
+        ],
+        "rules": [
+            {
+                "outbound": "any",
+                "server": "mainDNS"
+            },
+            {
+                "geosite": "private",
+                "server": "localDNS"
+            },
+            {
+                "clash_mode": "direct",
+                "server": "mainDNS"
+            },
+            {
+                "query_type": ["HTTPS", "AAAA"],
+                "server": "refusedDNS"
+            },
+			{
+				"geosite": [
+				  "geolocation-!cn"
+				],
+                "server": "fakeipDNS"
+            },
+            {
+                "geosite": [
+                    "cn"
+                ],
+                "server": "mainDNS"
+            }
+        ],
+        "final": "localDNS",
+        "strategy": "ipv4_only",
+        "disable_cache": false,
+        "disable_expire": false,
+        "independent_cache": true,
+        "reverse_mapping": false,
+        "fakeip": {
+            "enabled": true,
+            "inet4_range": "198.18.0.0/15",
+            "inet6_range": "fc00::/18"
+        }
+    },
+    "inbounds": [
+        {
+            "tag": "TPROXY-IN",
+            "type": "tproxy",
+            "listen": "0.0.0.0",
+            "listen_port": 7895,
+            "sniff": false
+        }
+    ],
+    "outbounds": [
+        {
+            "tag": "PROXY",
+            "type": "selector",
+            "outbounds": [
+                "VMESS",
+                "TROJAN"
+            ],
+            "default": "TROJAN",
+            "interrupt_exist_connections": false
+        },
+        {
+            "tag": "FINAL",
+            "type": "selector",
+            "outbounds": [
+                "PROXY",
+                "DIRECT"
+            ],
+            "default": "PROXY",
+            "interrupt_exist_connections": false
+        },
+        {
+            "tag": "APPLE",
+            "type": "selector",
+            "outbounds": [
+                "PROXY",
+                "DIRECT",
+                "VMESS",
+                "TROJAN"
+            ],
+            "default": "DIRECT",
+            "interrupt_exist_connections": false
+        },
+		{
+		  "tls": {
+			"enabled": true,
+			"ech": {
+			  "enabled": false,
+			  "pq_signature_schemes_enabled": false,
+			  "dynamic_record_sizing_disabled": false
+			},
+			"utls": {
+			  "enabled": false,
+			  "fingerprint": "chrome"
+			},
+			"reality": {
+			  "enabled": false
+			},
+			"insecure": true,
+			"disable_sni": false
+		  },
+		  "type": "vmess",
+		  "security": "auto",
+		  "server": "",
+		  "server_port": 443,
+		  "transport": {
+			"early_data_header_name": "Sec-WebSocket-Protocol",
+			"type": "ws",
+			"path": "\/downloadprivatefile",
+			"max_early_data": 2048
+		  },
+		  "global_padding": false,
+		  "uuid": "",
+		  "packet_encoding": "",
+		  "alter_id": 0,
+		  "multiplex": {
+			"enabled": true,
+			"padding": false,
+			"protocol": "smux",
+			"max_connections": 8
+		  },
+		  "authenticated_length": false,
+		  "tag": "VMESS"
+		},
+        {
+            "password": "",
+            "server": "",
+            "server_port": 20001,
+            "tag": "TROJAN",
+            "tls": {
+                "enabled": true,
+                "server_name": "mmbiz.qpic.cn",
+                "insecure": true
+            },
+            "type": "trojan"
+        },
+        {
+            "tag": "DIRECT",
+            "type": "direct"
+        },
+        {
+            "tag": "DNS-OUT",
+            "type": "dns"
+        },
+        {
+            "tag": "BLOCK",
+            "type": "block"
+        }
+    ],
+    "route": {
+        "geoip": {
+            "download_url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.db",
+            "download_detour": "PROXY"
+        },
+        "geosite": {
+            "download_url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.db",
+            "download_detour": "PROXY"
+        },
+        "rules": [
+            {
+                "protocol": "dns",
+                "outbound": "DNS-OUT"
+            },
+            {
+                "port": 53,
+                "outbound": "DNS-OUT"
+            },
+            {
+                "geosite": "private",
+                "outbound": "DIRECT"
+            },
+            {
+                "clash_mode": "direct",
+                "outbound": "DIRECT"
+            },
+            {
+                "clash_mode": "global",
+                "outbound": "PROXY"
+            },
+            {
+                "geosite": "apple",
+                "outbound": "APPLE"
+            },
+            {
+                "geosite": [
+                    "github",
+                    "google",
+                    "telegram",
+                    "gfw"
+                ],
+                "geoip": "telegram",
+                "outbound": "PROXY"
+            },
+            {
+                "geoip": ["private", "cn"],
+                "geosite": "cn",
+                "outbound": "DIRECT"
+            }
+        ],
+        "final": "FINAL",
+        "auto_detect_interface": true,
+        "auto_detect_interface": true,
+        "default_mark": 666
+    },
+    "experimental": {
+        "clash_api": {
+            "external_controller": "0.0.0.0:9090",
+            "external_ui": "ui",
+            "external_ui_download_url": "https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip",
+            "external_ui_download_detour": "PROXY",
+            "secret": "secret",
+            "default_mode": "rule",
+            "store_mode": false,
+            "store_selected": false,
+            "store_fakeip": true
+        }
+    }
+}
+

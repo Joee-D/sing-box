@@ -1,0 +1,346 @@
+{
+  "outbounds": [
+    {
+      "tls": {
+        "enabled": true,
+        "ech": {
+          "enabled": false,
+          "pq_signature_schemes_enabled": false,
+          "dynamic_record_sizing_disabled": false
+        },
+        "utls": {
+          "enabled": false,
+          "fingerprint": "chrome"
+        },
+        "reality": {
+          "enabled": false
+        },
+        "insecure": true,
+        "disable_sni": false
+      },
+      "type": "vmess",
+      "security": "auto",
+      "server": "",
+      "server_port": 443,
+      "transport": {
+        "early_data_header_name": "Sec-WebSocket-Protocol",
+        "type": "ws",
+        "path": "\/downloadprivatefile",
+        "max_early_data": 2048
+      },
+      "global_padding": false,
+      "uuid": "",
+      "packet_encoding": "",
+      "alter_id": 0,
+      "multiplex": {
+        "enabled": true,
+        "padding": false,
+        "protocol": "smux",
+        "max_connections": 8
+      },
+      "authenticated_length": false,
+      "tag": "default"
+    },
+    {
+      "tag": "dns-out",
+      "type": "dns"
+    },
+    {
+      "domain_strategy": "prefer_ipv6",
+      "type": "direct",
+      "routing_mark": 255,
+      "tag": "direct"
+    },
+    {
+      "tag": "block",
+      "type": "block"
+    }
+  ],
+  "log": {
+    "timestamp": true,
+    "level": "error",
+    "disabled": false,
+    "output": "\/etc\/tmp\/global.log"
+  },
+  "dns": {
+    "disable_cache": false,
+    "rules": [
+      {
+        "disable_cache": false,
+        "domain": [
+          "file.996.media"
+        ],
+        "server": "direct"
+      },
+      {
+        "disable_cache": false,
+        "domain_keyword": [
+          "apple.com",
+          "microsoft.com",
+          "dyndns.com",
+          "steamcontent.com",
+          "dl.steam.clngaa.com",
+          "dl.steam.ksyna.com",
+          "st.dl.bscstorage.net",
+          "st.dl.eccdnx.com",
+          "st.dl.pinyuncloud.com",
+          "cdn.mileweb.cs.steampowered.com.8686c.com",
+          "cdn-ws.content.steamchina.com",
+          "cdn-qc.content.steamchina.com",
+          "cdn-ali.content.steamchina.com",
+          "epicgames-download1-1251447533.file.myqcloud.com"
+        ],
+        "server": "direct"
+      },
+      {
+        "disable_cache": true,
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "domain_suffix": [
+          ".googleapis.cn",
+          ".googleapis.com",
+          ".xn--ngstr-lra8j.com"
+        ],
+        "domain": [
+          "googleapis.cn",
+          "googleapis.com",
+          "xn--ngstr-lra8j.com"
+        ],
+        "server": "remote_fakeip"
+      },
+      {
+        "disable_cache": false,
+        "domain_suffix": [
+          ".googleapis.cn",
+          ".googleapis.com",
+          ".xn--ngstr-lra8j.com"
+        ],
+        "domain": [
+          "googleapis.cn",
+          "googleapis.com",
+          "xn--ngstr-lra8j.com"
+        ],
+        "server": "remote"
+      },
+      {
+        "disable_cache": true,
+        "geosite": [
+          "geolocation-!cn"
+        ],
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "remote_fakeip"
+      },
+      {
+        "disable_cache": false,
+        "geosite": [
+          "geolocation-!cn"
+        ],
+        "server": "remote"
+      },
+      {
+        "disable_cache": false,
+        "geosite": [
+          "cn"
+        ],
+        "server": "direct"
+      }
+    ],
+    "independent_cache": false,
+    "fakeip": {
+      "enabled": true,
+      "inet6_range": "fc00::\/18",
+      "inet4_range": "198.18.0.0\/16"
+    },
+    "servers": [
+      {
+        "address": "rcode:\/\/success",
+        "tag": "block"
+      },
+      {
+        "address_strategy": "prefer_ipv4",
+        "address": "tcp:\/\/1.1.1.1:53",
+        "address_resolver": "direct",
+        "strategy": "ipv4_only",
+        "detour": "default",
+        "tag": "remote"
+      },
+      {
+        "strategy": "ipv4_only",
+        "address": "fakeip",
+        "tag": "remote_fakeip"
+      },
+      {
+        "address_strategy": "prefer_ipv6",
+        "address": "udp:\/\/116.116.116.116",
+        "strategy": "prefer_ipv6",
+        "detour": "direct",
+        "tag": "direct"
+      }
+    ],
+    "reverse_mapping": true,
+    "disable_expire": false,
+    "final": "remote"
+  },
+  "experimental": {
+	"clash_api": {
+		"external_controller": "0.0.0.0:9090",
+		"external_ui": "ui",
+		"external_ui_download_url": "https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip",
+		"external_ui_download_detour": "default",
+		"secret": "secret",
+		"default_mode": "rule",
+		"store_mode": false,
+		"store_selected": false,
+		"store_fakeip": true
+	}
+  },
+  "route": {
+    "rules": [
+      {
+        "outbound": "dns-out",
+        "inbound": [
+          "dns-in"
+        ],
+        "protocol": "dns"
+      },
+      {
+        "outbound": "direct",
+        "ip_cidr": [
+          "114.114.114.114",
+          "114.114.115.115",
+          "223.5.5.5",
+          "223.6.6.6",
+          "119.29.29.29",
+          "180.76.76.76"
+        ],
+        "network": [
+          "tcp",
+          "udp"
+        ],
+        "domain_keyword": [
+          "apple.com",
+          "microsoft.com",
+          "dyndns.com",
+          "steamcontent.com",
+          "dl.steam.clngaa.com",
+          "dl.steam.ksyna.com",
+          "st.dl.bscstorage.net",
+          "st.dl.eccdnx.com",
+          "st.dl.pinyuncloud.com",
+          "cdn.mileweb.cs.steampowered.com.8686c.com",
+          "cdn-ws.content.steamchina.com",
+          "cdn-qc.content.steamchina.com",
+          "cdn-ali.content.steamchina.com",
+          "epicgames-download1-1251447533.file.myqcloud.com"
+        ],
+        "invert": false,
+        "geoip": [
+          "private"
+        ]
+      },
+      {
+        "outbound": "default",
+        "network": [
+          "tcp",
+          "udp"
+        ],
+        "domain_suffix": [
+          ".googleapis.cn",
+          ".googleapis.com",
+          ".xn--ngstr-lra8j.com"
+        ],
+        "invert": false,
+        "domain": [
+          "googleapis.cn",
+          "googleapis.com",
+          "xn--ngstr-lra8j.com"
+        ]
+      },
+      {
+        "outbound": "default",
+        "geosite": [
+          "geolocation-!cn"
+        ],
+        "network": [
+          "tcp",
+          "udp"
+        ],
+        "invert": false,
+        "ip_cidr": [
+          "149.154.160.0\/20",
+          "91.108.4.0\/22",
+          "91.108.56.0\/24",
+          "109.239.140.0\/24",
+          "67.198.55.0\/24",
+          "8.8.4.4",
+          "8.8.8.8",
+          "208.67.222.222",
+          "208.67.220.220",
+          "1.1.1.1",
+          "1.1.1.2",
+          "1.0.0.1",
+          "9.9.9.9",
+          "149.112.112.112",
+          "2001:67c:4e8::\/48",
+          "2001:b28:f23c::\/48",
+          "2001:b28:f23d::\/48",
+          "2001:b28:f23f::\/48",
+          "2001:b28:f242::\/48",
+          "2001:4860:4860::8888",
+          "2001:4860:4860::8844",
+          "2606:4700:4700::1111",
+          "2606:4700:4700::1001"
+        ]
+      },
+      {
+        "outbound": "direct",
+        "geosite": [
+          "cn"
+        ],
+        "network": [
+          "tcp",
+          "udp"
+        ],
+        "geoip": [
+          "cn"
+        ],
+        "invert": false
+      },
+      {
+        "outbound": "block",
+        "port": [
+          443
+        ],
+        "network": [
+          "udp"
+        ],
+        "invert": false
+      }
+    ],
+	"geoip": {
+		"download_url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.db",
+		"download_detour": "default"
+	},
+	"geosite": {
+		"download_url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.db",
+		"download_detour": "default"
+	},
+    "final": "default",
+	"default_mark": 666
+  },
+  "inbounds": [
+    {
+      "type": "tproxy",
+      "listen": "::",
+      "sniff": true,
+      "sniff_override_destination": false,
+      "listen_port": 7895,
+      "tag": "tproxy"
+    }
+  ]
+}
