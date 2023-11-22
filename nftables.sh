@@ -8,7 +8,7 @@ PROXY_ROUTE_TABLE=100
 
 clearFirewallRules()
 {
-	# ----- 删除路由表 -----
+    # ----- 删除路由表 -----
     IPRULE=$(ip rule show | grep $PROXY_ROUTE_TABLE)
     if [ -n "$IPRULE" ]
     then
@@ -16,20 +16,20 @@ clearFirewallRules()
         ip -f inet route del local default dev $INTERFACE table $PROXY_ROUTE_TABLE
         echo "clear ip rule"
     fi
-	# ----- 删除防火墙规则 -----
-	for nft in "mangle_prerouting" "mangle_output"; do
-		local handles=$(nft -a list chain inet fw4 ${nft} 2>/dev/null | grep -E "prerouting_tproxy" | grep -E "output_tproxy" | awk -F '# handle ' '{print$2}')
-			for handle in $handles; do
-			nft delete rule inet fw4 ${nft} handle ${handle} 2>/dev/null
-		done
-	done
-	# ----- 删除防火墙链 -----
-	for handle in $(nft -a list chains | grep -E "chain prerouting_tproxy" | grep -E "chain output_tproxy" | awk -F '# handle ' '{print$2}'); do
-		nft delete chain inet fw4 handle ${handle} 2>/dev/null
-	done
-	# ----- 删除防火墙集合 -----
-	nft delete set inet fw4 localnetwork
- 	nft delete set inet fw4 local
+    # ----- 删除防火墙规则 -----
+    for nft in "mangle_prerouting" "mangle_output"; do
+        local handles=$(nft -a list chain inet fw4 ${nft} 2>/dev/null | grep -E "prerouting_tproxy" | grep -E "output_tproxy" | awk -F '# handle ' '{print$2}')
+            for handle in $handles; do
+            nft delete rule inet fw4 ${nft} handle ${handle} 2>/dev/null
+        done
+    done
+    # ----- 删除防火墙链 -----
+    for handle in $(nft -a list chains | grep -E "chain prerouting_tproxy" | grep -E "chain output_tproxy" | awk -F '# handle ' '{print$2}'); do
+        nft delete chain inet fw4 handle ${handle} 2>/dev/null
+    done
+    # ----- 删除防火墙集合 -----
+    nft delete set inet fw4 localnetwork
+    nft delete set inet fw4 local
 
     echo "clear nftables"
 }
