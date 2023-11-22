@@ -6,6 +6,21 @@ ROUTING_MARK=666 ## 和 sing-box 中定义的一致
 PROXY_FWMARK=1
 PROXY_ROUTE_TABLE=100
 
+define LOCAL_NETWORK = {
+    100.64.0.0/10,
+    127.0.0.0/8,
+    169.254.0.0/16,
+    172.16.0.0/12,
+    192.0.0.0/24,
+    224.0.0.0/4,
+    240.0.0.0/4,
+    255.255.255.255/32
+} ##添加本地地址规则
+
+define DIRECT = {
+    192.168.1.1-192.168.1.100
+} ##添加直连ip地址规则
+
 clearFirewallRules()
 {
     # ----- 删除路由表 -----
@@ -34,21 +49,17 @@ clearFirewallRules()
     echo "clear nftables"
 }
 
-if [ $1 = 'set' ]
-then
-
-    # ----- 清除路由表及防火墙 -----
-    clearFirewallRules
-
+setFirewallRules()
+{
     # ----- 添加路由表 -----
     ip -f inet rule add fwmark $PROXY_FWMARK lookup $PROXY_ROUTE_TABLE
     ip -f inet route add local default dev $INTERFACE table $PROXY_ROUTE_TABLE
 
-    # ----- ip地址集合 -----
-    nft add set inet fw4 localnetwork { type ipv4_addr \; flags interval \; } ##添加本地地址规则
-    nft add element inet fw4 localnetwork { 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.0.0.0/24, 224.0.0.0/4, 240.0.0.0/4, 255.255.255.255/32 }
-	nft add set inet fw4 direct { type ipv4_addr \; flags interval \; } ##添加直连ip地址规则
-    nft add element inet fw4 direct { 192.168.1.1-192.168.1.100 }
+    # ----- 防火墙ip地址集合 -----
+    nft add set inet fw4 localnetwork { type ipv4_addr \; flags interval \; }
+    nft add element inet fw4 localnetwork $LOCAL_NETWORK
+    nft add set inet fw4 direct { type ipv4_addr \; flags interval \; }
+    nft add element inet fw4 direct $DIRECT
 
     # ----- prerouting 局域网设备透明代理 -----
     nft add chain inet fw4 prerouting_tproxy
@@ -67,9 +78,15 @@ then
     nft add rule inet fw4 output_tproxy meta l4proto {tcp,udp} meta mark set $PROXY_FWMARK ## 其他流量重路由到prerouting
     
     echo "set nftables"
+}
 
-elif [ $1 = 'clear' ]
+if [ $1 = 'start' ]
+then
+    ./sing-box run
+    setFirewallRules
+
+elif [ $1 = 'stop' ]
 then
     clearFirewallRules
+    ./sing-box stop
 fi
-
