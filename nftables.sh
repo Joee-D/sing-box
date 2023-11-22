@@ -82,7 +82,7 @@ setFirewallRules()
 
 if [ $1 = 'start' ]
 then
-    ./sing-box run
+    ./sing-box -D /etc/sing-box -c /etc/sing-box/config.json run
     setFirewallRules
 
 elif [ $1 = 'stop' ]
