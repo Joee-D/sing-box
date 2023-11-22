@@ -44,7 +44,7 @@ clearFirewallRules()
     done
     # ----- 删除防火墙集合 -----
     nft delete set inet fw4 localnetwork
-    nft delete set inet fw4 local
+    nft delete set inet fw4 direct
 
     echo "clear nftables"
 }
