@@ -40,7 +40,7 @@ setFirewallRules()
     ip -f inet rule add fwmark $PROXY_FWMARK lookup $PROXY_ROUTE_TABLE
     ip -f inet route add local default dev $INTERFACE table $PROXY_ROUTE_TABLE
 	
-	echo "set ip rule"
+    echo "set ip rule"
 	
     # ----- 防火墙ip地址集合 -----
     nft add set inet fw4 localnetwork { type ipv4_addr \; flags interval \; }
@@ -51,7 +51,7 @@ setFirewallRules()
     # ----- prerouting 局域网设备透明代理 -----
     nft "add chain inet fw4 prerouting_tproxy"
     nft "add rule inet fw4 prerouting_tproxy ip daddr @localnetwork return" ## 绕过局域网地址
-	nft "add rule inet fw4 prerouting_tproxy fib daddr type local return" ## 绕过本机地址
+    nft "add rule inet fw4 prerouting_tproxy fib daddr type local return" ## 绕过本机地址
     nft "add rule inet fw4 prerouting_tproxy ip saddr @direct return" ## 绕过直连地址
     nft "add rule inet fw4 prerouting_tproxy meta l4proto {tcp,udp} socket transparent 1 meta mark set $PROXY_FWMARK return" ## 绕过已经建立的tproxy连接
     nft "add rule inet fw4 prerouting_tproxy meta l4proto {tcp,udp} tproxy to :$TPROXY_PORT meta mark set $PROXY_FWMARK" accept ## 其他流量透明代理
@@ -61,12 +61,12 @@ setFirewallRules()
     nft "add rule inet fw4 output_tproxy meta oifname != $INTERFACE return" ## 绕过本机内部通信的流量(接口lo)
     nft "add rule inet fw4 output_tproxy meta mark $ROUTING_MARK return" ## 绕过本机sing-box发出的流量
     nft "add rule inet fw4 output_tproxy ip daddr @localnetwork return" ## 绕过局域网地址
-	nft "add rule inet fw4 output_tproxy fib daddr type local return" ## 绕过本机地址
+    nft "add rule inet fw4 output_tproxy fib daddr type local return" ## 绕过本机地址
     nft "add rule inet fw4 output_tproxy ip saddr @direct return" ## 绕过直连地址
     nft "add rule inet fw4 output_tproxy meta l4proto {tcp,udp} meta mark set $PROXY_FWMARK" ## 其他流量重路由到prerouting
 
-	nft "add rule inet fw4 mangle_prerouting meta nfproto {ipv4} counter jump prerouting_tproxy"
-	nft "add rule inet fw4 mangle_output meta nfproto {ipv4} counter jump output_tproxy"
+    nft "add rule inet fw4 mangle_prerouting meta nfproto {ipv4} counter jump prerouting_tproxy"
+    nft "add rule inet fw4 mangle_output meta nfproto {ipv4} counter jump output_tproxy"
 
     echo "set nftables"
 }
